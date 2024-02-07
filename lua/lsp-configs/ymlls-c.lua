@@ -24,7 +24,11 @@ local cfg = require("yaml-companion").setup({
             redhat = { telemetry = { enabled = false } },
             yaml = {
                 validate = true,
-                format = { enable = true },
+                format = {
+                    enable = true,
+                    bracketSpacing = false,
+                },
+                editor = { tabSize = 2 },
                 hover = true,
                 schemaStore = {
                     enable = true,
