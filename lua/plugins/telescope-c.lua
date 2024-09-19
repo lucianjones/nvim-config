@@ -47,6 +47,7 @@ return {
     dependencies = {
         { 'nvim-lua/plenary.nvim' },
         { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
-        { 'someone-stole-my-name/yaml-companion.nvim' },
+        { 'msvechla/yaml-companion.nvim',             branch = 'kubernetes_crd_detection' },
+        { 'Dronakurl/injectme.nvim',                  cmd = { "InjectmeToggle", "InjectmeSave", "InjectmeInfo", "InjectmeLeave" } },
     },
 }

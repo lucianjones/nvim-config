@@ -25,6 +25,7 @@ opt.cursorline = true
 opt.cursorlineopt = 'number'
 opt.signcolumn = 'yes'
 opt.mouse = 'a'
+opt.fillchars = { eob = " " }
 
 -- search
 opt.ignorecase = true
@@ -36,3 +37,8 @@ opt.updatetime = 300
 opt.termguicolors = true
 opt.clipboard = 'unnamedplus'
 opt.hidden = true
+
+
+vim.o.termguicolors = true
+g.python_host_prog = '/Users/lucian.jones/venvs/.nvim-venv/bin/python'
+g.python3_host_prog = '/Users/lucian.jones/venvs/.nvim-venv/bin/python'

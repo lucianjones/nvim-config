@@ -28,16 +28,23 @@ return {
         },
     },
     {
-        'lukas-reineke/indent-blankline.nvim',
-        lazy = false,
-        main = "ibl",
-        opts = {},
-    },
-    {
         "dstein64/vim-startuptime",
         cmd = "StartupTime",
         init = function()
             vim.g.startuptime_tries = 10
         end,
     },
+    {
+        'echasnovski/mini.indentscope',
+        version = false,
+        lazy = false,
+        config = function()
+            require("mini.indentscope").setup({
+                options = {
+                    indent_at_cursor = true,
+                    try_as_border = true,
+                }
+            })
+        end,
+    }
 }

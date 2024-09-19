@@ -21,6 +21,7 @@ return {
             build = ':MasonUpdate',
         },
         { 'jay-babu/mason-nvim-dap.nvim' },
+        { 'nvim-neotest/nvim-nio' },
         { 'rcarriga/nvim-dap-ui' },
     },
     config = function()

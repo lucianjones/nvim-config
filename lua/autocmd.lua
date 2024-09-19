@@ -42,3 +42,18 @@ api.nvim_create_autocmd(
         command = "setlocal ts=2 sts=2 sw=2 expandtab"
     }
 )
+api.nvim_create_autocmd(
+    { "BufNewFile", "BufRead" },
+    {
+        pattern = { "*/templates/*.yaml", "*/templates/*.tpl", "*.gotmpl", "helmfile*.yaml", "Chart.yaml" },
+        command = "setlocal filetype=helm"
+    }
+)
+-- api.nvim_create_autocmd(
+--     { "FileType" },
+--     {
+--         pattern = { "helm" },
+--         callback = function() vim.diagnostic.enable(false) end
+
+--     }
+-- )

@@ -17,4 +17,24 @@ end
 lspconfig.helm_ls.setup {
     filetypes = { "helm" },
     cmd = { "helm_ls", "serve" },
+    settings = {
+        ['helm-ls'] = {
+            valuesFiles = {
+                mainValuesFile = "values.yaml",
+                additionalValuesFilesGlobPattern = "ci/*-values.yaml",
+            },
+            yamlls = {
+                enabled = true,
+                showDiagnosticsDirectly = false,
+                path = "yaml-language-server",
+                config = {
+                    schemas = {
+                        kubernetes = "templates/**",
+                    },
+                    completion = true,
+                    hover = true,
+                },
+            },
+        }
+    }
 }

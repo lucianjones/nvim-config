@@ -1,3 +1,5 @@
 require('lsp-configs.ymlls-c')
 require('lsp-configs.luals-c')
-require('lsp-configs.pylance-c')
+require('lsp-configs.helmls-c')
+require('lsp-configs.ruff-c')
+require('lsp-configs.basedpyright-c')

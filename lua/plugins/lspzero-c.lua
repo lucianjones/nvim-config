@@ -1,5 +1,7 @@
 vim.diagnostic.config({
-    virtual_text = true,
+    virtual_text = {
+        source = "always"
+    },
     signs = true,
     float = {
         format = function(diagnostic)
@@ -34,11 +36,13 @@ return {
             { 'hrsh7th/cmp-buffer' },
             { 'saadparwaiz1/cmp_luasnip' },
             { 'onsails/lspkind.nvim' },
+            { "roobert/tailwindcss-colorizer-cmp.nvim" },
         },
         config = function()
             local cmp = require('cmp')
             local cmp_action = require('lsp-zero.cmp').action()
-            require("luasnip.loaders.from_vscode").lazy_load()
+            local luasnip = require("luasnip")
+            local lspkind = require("lspkind")
 
             cmp.setup({
                 preselect = 'item',
@@ -47,12 +51,22 @@ return {
                     autocomplete = false,
                 },
                 window = {
-                    completion = cmp.config.window.bordered(),
-                    documentation = cmp.config.window.bordered(),
+                    completion = {
+                        border = "rounded",
+                        winhighlight = "Normal:Normal,FloatBorder:Comment,CursorLine:CursorLineBG,Search:None",
+                        side_padding = 0,
+                        col_offset = -4,
+                        completeopt = 'menu,menuone,noinsert',
+                        autocomplete = false,
+                    },
+                    documentation = {
+                        border = "rounded",
+                        winhighlight = "Normal:Normal,FloatBorder:Comment,CursorLine:CursorLineBG,Search:None",
+                    },
                 },
                 snippet = {
                     expand = function(args)
-                        require('luasnip').lsp_expand(args.body)
+                        luasnip.lsp_expand(args.body)
                     end
                 },
                 sources = {
@@ -67,15 +81,65 @@ return {
                     ['<S-Tab>'] = cmp_action.luasnip_shift_supertab(),
                 },
                 formatting = {
-                    format = require('lspkind').cmp_format({
-                        mode = "symbol_text",
-                        menu = ({
-                            buffer = "Buffer",
-                            nvim_lsp = "LSP",
-                            luasnip = "LuaSnip",
-                            nvim_lua = "Lua",
-                        })
-                    }),
+                    expandable_indicator = true,
+                    fields = { 'kind', 'abbr', 'menu' },
+                    format = function(entry, item)
+                        local fmt = lspkind.cmp_format({
+                            mode = "symbol_text",
+                            maxwidth = 50,
+                            ellipsis_char = '...',
+                            menu = ({
+                                buffer = "Buffer",
+                                nvim_lsp = "LSP",
+                                luasnip = "LuaSnip",
+                                nvim_lua = "Lua",
+                            })
+                        })(entry, item)
+
+                        local cmp_kinds = {
+                            Text = "",
+                            Method = "",
+                            Function = "",
+                            Constructor = "",
+                            Field = "",
+                            Variable = "",
+                            Class = "",
+                            Interface = "",
+                            Module = "",
+                            Property = "",
+                            Unit = "",
+                            Value = "",
+                            Enum = "",
+                            Keyword = "",
+                            Snippet = "",
+                            Color = "",
+                            File = "",
+                            Reference = "",
+                            Folder = "",
+                            EnumMember = "",
+                            Constant = "",
+                            Struct = "",
+                            Event = "",
+                            Operator = "",
+                            TypeParameter = "",
+                        }
+
+                        local strings = vim.split(fmt.kind, "%s", { trimempty = true })
+                        local type = strings[2]
+
+                        local lspserver_name = ""
+                        if entry.source.name == 'nvim_lsp' then
+                            lspserver_name = entry.source.source.client.name
+                        end
+
+                        local src = " [" .. ((lspserver_name or fmt.menu[entry.source.name]) .. "]")
+
+                        fmt.kind = " " .. (cmp_kinds[type] or "")
+                        fmt.kind = fmt.kind .. " "
+                        fmt.menu = type ~= nil and "  " .. (strings[2] .. src) or ""
+
+                        return fmt
+                    end
                 },
             })
         end
@@ -132,6 +196,7 @@ return {
 
             lsp.ensure_installed({
                 'arduino_language_server',
+                'basedpyright',
                 'bashls',
                 'clangd',
                 'cssls',
@@ -142,7 +207,6 @@ return {
                 'jsonls',
                 'tsserver',
                 'lua_ls',
-                -- 'pyright',
                 'rust_analyzer',
                 'sqlls',
                 'taplo',
@@ -152,7 +216,6 @@ return {
                 'zk',
             })
 
-            -- lsp.setup_servers({ 'pylance' })
             require('lsp-configs')
             require("neodev").setup({})
 
@@ -178,13 +241,11 @@ return {
 
             require('mason-null-ls').setup({
                 ensure_installed = {
-                    'black',
-                    'flake8',
-                    'isort',
+                    'ruff',
                     'prettier',
                     'tflint',
                 },
-                automatic_installation = false,
+                automatic_installation = true,
                 handlers = {},
             })
         end

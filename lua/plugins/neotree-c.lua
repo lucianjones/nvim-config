@@ -2,7 +2,7 @@ return {
     "nvim-neo-tree/neo-tree.nvim",
     branch = "v3.x",
     keys = {
-        { [[<leader>e]], '<cmd>Neotree focus filesystem toggle reveal<CR>', 'n', silent = true }
+        { [[<leader>e]], '<cmd>Neotree focus last left toggle reveal<CR>', 'n', silent = true },
     },
     opts = {
         sources = {
@@ -14,17 +14,28 @@ return {
         add_blank_line_at_top = false,
         close_if_last_window = true,
         default_component_configs = {
+            icon = {
+                folder_closed = "",
+                folder_open = "",
+                folder_empty = "",
+                highlight = "Comment"
+            },
+            name = {
+                use_git_status_colors = false,
+                trailing_slash = true,
+            },
             git_status = {
                 symbols = {
                     added     = '✚',
-                    modified  = '',
-                    deleted   = '✖',
-                    renamed   = '󰁕',
-                    untracked = '?',
-                    ignored   = '',
-                    unstaged  = '󰄱',
-                    staged    = '',
+                    modified  = '',
                     conflict  = '',
+                    unstaged  = "",
+                    staged    = "",
+                    unmerged  = "",
+                    renamed   = "➜",
+                    untracked = "",
+                    deleted   = "",
+                    ignored   = "◌",
                 }
             },
             diagnostics = {
@@ -132,6 +143,9 @@ return {
                 },
             },
         },
+        document_symbols = {
+            follow_cursor = true,
+        },
         source_selector = {
             winbar = true,
             sources = {
@@ -151,6 +165,41 @@ return {
                     require("neo-tree.command").execute({ action = "close" })
                 end
             },
+            {
+                event = "after_render",
+                handler = function(state)
+                    if state.name == "document_symbols" then
+                        local renderer = require("neo-tree.ui.renderer")
+                        local nodes = state.tree:get_nodes()
+                        local updated = false
+
+                        for _, node in ipairs(nodes) do
+                            local max_depth = 5
+                            local max_depth_reached = 1
+                            local stack = { node }
+                            while next(stack) ~= nil do
+                                node = table.remove(stack)
+                                if node:has_children() and not node:is_expanded() then
+                                    updated = node:expand()
+                                end
+
+                                local depth = node:get_depth()
+                                max_depth_reached = math.max(depth, max_depth_reached)
+
+                                if not max_depth or depth < max_depth - 1 then
+                                    local children = state.tree:get_nodes(node:get_id())
+                                    for _, v in ipairs(children) do
+                                        table.insert(stack, v)
+                                    end
+                                end
+                            end
+                        end
+                        if updated then
+                            renderer.redraw(state)
+                        end
+                    end
+                end
+            }
         },
     },
     config = function(_, opts)
@@ -161,6 +210,9 @@ return {
             hi NormalFloat guibg=none
             hi NeoTreeFloatTitle guibg=none
             hi NeoTreeTabInactive guibg=none
+            hi NeoTreeTabSeparatorInactive guifg=#08435e guibg=none
+            hi link NeoTreeDirectoryIcon LineNr
+            hi link NeoTreeDirectoryName NeoFusionBlue
         ]]
     end,
     dependencies = {
